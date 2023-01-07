@@ -11,6 +11,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.function.SerializableRunnable;
 import java.util.Set;
 
@@ -33,11 +34,16 @@ public class ProductForm extends Composite<Component> {
     manufacturer.setItems(manufacturers);
     manufacturer.setItemLabelGenerator(Manufacturer::getName);
 
-    if (product.getName() != null) {
-      name.setValue(product.getName());
-      manufacturer.setValue(product.getManufacturer());
-      availbale.setValue(product.isAvailable());
-    }
+    Binder<Product> binder = new Binder<>();
+    binder.bind(name, Product::getName, Product::setName);
+    binder.bind(
+      manufacturer,
+      Product::getManufacturer,
+      Product::setManufacturer
+    );
+    binder.bind(availbale, Product::isAvailable, Product::setAvailable);
+
+    binder.setBean(product);
   }
 
   @Override
@@ -51,16 +57,9 @@ public class ProductForm extends Composite<Component> {
         "Save",
         VaadinIcon.CHECK.create(),
         e -> {
-          saveProduct();
+          saveListner.run();
         }
       )
     );
-  }
-
-  private void saveProduct() {
-    product.setName(name.getValue());
-    product.setManufacturer(manufacturer.getValue());
-    product.setAvailable(availbale.getValue());
-    saveListner.run();
   }
 }
